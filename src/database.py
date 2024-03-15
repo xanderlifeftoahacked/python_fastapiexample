@@ -3,7 +3,7 @@ from typing import Optional
 from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 
-engine = create_async_engine('sqlite+aiosqlite:///../tasks.db')
+engine = create_async_engine('sqlite+aiosqlite:///../database.db')
 new_session = async_sessionmaker(engine, expire_on_commit=False)
 
 
@@ -17,6 +17,15 @@ class TaskTable(Model):
     id: Mapped[int] = mapped_column(primary_key=True)
     name: Mapped[str]
     description: Mapped[Optional[str]]
+    phone_number: Mapped[Optional[str]]
+
+
+class UsersTable(Model):
+    __tablename__ = 'users'
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    login: Mapped[str] = mapped_column(unique=True)
+    password_hash: Mapped[str]
     phone_number: Mapped[Optional[str]]
 
 

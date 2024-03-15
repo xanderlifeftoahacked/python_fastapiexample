@@ -1,41 +1,30 @@
 from typing import Optional
-import re
 
-from pydantic import BaseModel, validator
+from pydantic import BaseModel, Field, validator
 
 
 class STaskAdd(BaseModel):
-    name: str
-    description: Optional[str] = None
-    phone_number: Optional[str] = None
-
-    @validator("phone_number")
-    def validate_phone(cls, value):
-        if value is None:
-            return value
-        if len(value) > 30:
-            raise ValueError("Too long number!")
-        if not re.fullmatch(r'\+[\d]+', value):
-            raise ValueError(
-                "Wrong phone number")
-        return value
-
-    @validator("name")
-    def validate_name(cls, value):
-        if value is None or not value:
-            raise ValueError("Empty name!")
-        if len(value) > 30:
-            raise ValueError("Too long name!")
-        return value
-
-    @validator("description")
-    def validate_desc(cls, value):
-        if value is None or not value:
-            raise ValueError("Empty description!")
-        if len(value) > 200:
-            raise ValueError("Too long description!")
-        return value
+    name: str = Field(..., max_length=30, min_length=1)
+    description: Optional[str] = Field(None, max_length=300)
+    phone_number: Optional[str] = Field(None,
+                                        pattern=r'\+[\d]+', max_length=30, min_length=1)
 
 
 class STask(STaskAdd):
     id: int
+
+
+class SUserAdd(BaseModel):
+    login: str = Field(..., pattern=r'[a-zA-Z0-9-]+',
+                       max_length=30, min_length=1)
+    password: str = Field(...,
+                          pattern=r'^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{6,}$', max_length=30, min_length=1)
+
+    phone_number: Optional[str] = Field(None,
+                                        pattern=r'\+[\d]+', max_length=30, min_length=1)
+
+
+class SUser(BaseModel):
+    id: int
+    login: str
+    phone_number: Optional[str] = None
